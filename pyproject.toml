@@ -31,6 +31,32 @@ dependencies = [
 
 requires-python = ">=3.11"
 
+[tool.uv]
+# Only resolve for the container target: Linux x86_64, Python 3.11.
+environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.11'",
+]
+
+[tool.uv.sources]
+cudf-cu12 = { index = "nvidia" }
+dask-cudf-cu12 = { index = "nvidia" }
+cucim-cu12 = { index = "nvidia" }
+raft-dask-cu12 = { index = "nvidia" }
+torch = { index = "pytorch-cu129" }
+torchvision = { index = "pytorch-cu129" }
+
+# Explicit indexes are only used for packages mapped to them in [tool.uv.sources].
+[[tool.uv.index]]
+name = "nvidia"
+url = "https://pypi.nvidia.com"
+explicit = true
+
+[[tool.uv.index]]
+# Ensures pytorch uses cu12 to match gpu deps
+name = "pytorch-cu129"
+url = "https://download.pytorch.org/whl/cu129"
+explicit = true
+
 [tool.setuptools.packages.find]
 # All the following settings are optional:
 where = ["src"]
@@ -44,4 +70,14 @@ docs = [
     "sphinx-design",
     "sphinx-rtd-theme == 2.0.0",
     "furo",
+]
+# All CUDA 12 builds: RAPIDS from pypi.nvidia.com, torch from PyTorch's cu129 index.
+# torch/torchvision are listed directly so [tool.uv.sources] applies to them.
+gpu = [
+    "cudf-cu12 == 26.10.*",
+    "dask-cudf-cu12 == 26.10.*",
+    "cucim-cu12 == 26.10.*",
+    "raft-dask-cu12 == 26.10.*",
+    "torch == 2.13.0",
+    "torchvision == 0.28.0",
 ]

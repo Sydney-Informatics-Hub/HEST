@@ -69,16 +69,12 @@ RUN apt-get update \
       libglib2.0-0t64 \
  && rm -rf /var/lib/apt/lists/*
 
-# Non-root default for plain `docker run` (e.g. local testing). Singularity ignores USER and
-# runs as the host user, so nothing below may depend on this user's identity or home.
-RUN useradd --uid 10001 --create-home --shell /usr/sbin/nologin hest
-
 COPY --from=builder /opt/python /opt/python
 COPY --from=builder /opt/venv /opt/venv
 COPY LICENSE.md /opt/hest/LICENSE.md
 
 # Single writable cache root. Bind-mount scratch here at runtime, e.g.
-#   apptainer exec --nv --bind /scratch/<proj>/$USER/hest-cache:/cache hest.sif ...
+#   singularity exec --nv --bind /scratch/<proj>/$USER/hest-cache:/cache hest.sif ...
 # 1777 so it also works unmounted under plain `docker run` (container writable layer).
 RUN mkdir -p /cache && chmod 1777 /cache
 
@@ -97,8 +93,5 @@ LABEL org.opencontainers.image.title="hest" \
       org.opencontainers.image.source="https://github.com/Sydney-Informatics-Hub/HEST" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.licenses="CC-BY-NC-SA-4.0"
-
-USER 10001
-WORKDIR /home/hest
 
 CMD ["python"]

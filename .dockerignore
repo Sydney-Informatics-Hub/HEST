@@ -1,0 +1,8 @@
+# Exclude all files by default
+*
+
+# include in build context
+!uv.lock
+!pyproject.toml
+!src
+!LICENSE.md
